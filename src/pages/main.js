@@ -11,22 +11,37 @@ export default class Main extends Component {
   }
 
   state = {
-    products: []
-  }
+    page: 1,
+    products: [],
+    productInfo: null,
+  };
 
   componentDidMount() {
     this.loadProducts();
   }
 
-  loadProducts = async () => {
-    const response = await api.get('/products');
+  loadProducts = async (page = 1) => {
+    const response = await api.get(`/products?page=${page}`);
 
-    const { docs: products } = response.data;
+    const { docs: products, ...productInfo } = response.data;
 
     console.log(products); // (CTRL + M) no emulador para debugar remotamente
 
-    this.setState({ products })
+    this.setState({
+      page,
+      productInfo,
+      products: [...this.state.products, ...products],
+    });
   }
+
+  loadMore = () => {
+    const { page, productInfo } = this.state;
+
+    if (page === productInfo.pages) return;
+
+    const pageNumber = page + 1;
+    this.loadProducts(pageNumber);
+  };
 
   renderItems = ({ item: { title, description, url } }) => (
     <View style={styles.productContainer}>
@@ -48,7 +63,10 @@ export default class Main extends Component {
           data={products}
           keyExtractor={p => p._id}
           renderItem={this.renderItems}
-          contentContainerStyle={styles.list}>
+          onEndReached={this.loadMore}
+          onEndReachedThreshold={0.1} // faltando 10% do final da lista, dispare õ método para carregar mais items
+          contentContainerStyle={styles.list}
+          >
         </FlatList>
       </View>
     );
