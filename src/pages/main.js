@@ -8,7 +8,7 @@ export default class Main extends Component {
 
   static navigationOptions = {
     title: 'JSHunt'
-  }
+  };
 
   state = {
     page: 1,
@@ -48,7 +48,9 @@ export default class Main extends Component {
       <Text style={styles.productTitle}>{title}</Text>
       <Text style={styles.productDescription}>{description}</Text>
 
-      <TouchableOpacity style={styles.productButton} onPress={() => {}}>
+      <TouchableOpacity style={styles.productButton} onPress={() => {
+        this.props.navigation.navigate('Product', { product: { title, description, url } })
+      }}>
         <Text style={styles.productButtonText}>Acessar</Text>
       </TouchableOpacity>
     </View>
